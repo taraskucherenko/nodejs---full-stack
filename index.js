@@ -32,18 +32,8 @@ function fight() {
       mobHealth = 0;
     }
 
-    if (characterHealth === 0 && mobHealth > 0) {
-      isCharacterDead = true
-    }
-
-    if (characterHealth > 0 && mobHealth === 0) {
-      isMobDead = true
-    }
-
-    if (characterHealth === 0 && mobHealth === 0) {
-      isCharacterDead = true
-      isMobDead = true
-    }
+    isCharacterDead = characterHealth === 0
+    isMobDead = mobHealth === 0
 
     console.log(`
 === Round ${i} ============================================
@@ -64,18 +54,22 @@ ${mobName} ${mobClass} Health: ${mobHealth}`)
 
   if (isCharacterDead) {
     console.log(`
+${mobName} ${mobClass} hit ${characterName} with ${mobDamage} dmg
 ☠ ☠  ${characterClass} ${characterName} is ${deadText}
     `)
   }
 
   if (isMobDead) {
     console.log(`
+${characterClass} ${characterName} hit ${mobName} ${mobClass} with ${characterDamage} dmg
 ☠ ☠  ${mobName} ${mobClass} is ${deadText}
     `)
   }
 
   if (isCharacterDead && isMobDead) {
     console.log(`
+${mobName} ${mobClass} hit ${characterName} with ${mobDamage} dmg
+${characterClass} ${characterName} hit ${mobName} ${mobClass} with ${characterDamage} dmg
 ☠ ☠  ${characterClass} ${characterName} and ${mobName} ${mobClass} are ${deadText}
     `)
   }
