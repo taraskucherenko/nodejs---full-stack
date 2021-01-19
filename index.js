@@ -51,11 +51,11 @@ function fight() {
 
     if (characterHealth > 0 && mobHealth > 0) {
       console.log(`${mobName} ${mobClass} hit ${characterName} with ${mobDamage} dmg
-${characterName} Health: ${characterHealth}
+${characterClass} ${characterName} Health: ${characterHealth}
 
 || ----------------------------
 
-${characterName} hit ${mobName} ${mobClass} with ${characterDamage} dmg
+${characterClass} ${characterName} hit ${mobName} ${mobClass} with ${characterDamage} dmg
 ${mobName} ${mobClass} Health: ${mobHealth}`)
     }
 
