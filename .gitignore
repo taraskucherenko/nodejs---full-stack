@@ -15,3 +15,4 @@ node_modules
 dist
 yarn.lock
 package-lock.json
+index-src.js
