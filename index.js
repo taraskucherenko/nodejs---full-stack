@@ -23,7 +23,7 @@ function getRandomDamage(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
 
-function Init() {
+function init() {
   console.log(`
 -----------------------------------
 | Location: ${characterLocation}
@@ -38,7 +38,7 @@ function Init() {
 -----------------------------------`)
 }
 
-function Round(iteration) {
+function round(iteration) {
   characterHealth -= mobDamage;
   mobHealth -= characterDamage;
 
@@ -70,14 +70,14 @@ In ${mob} lefts ${mobHealth} hp`
   isMobDead = mobHealth === 0
 }
 
-function Fight() {
+function fight() {
   console.log(`
 || --------------------------------
 || Fight
 || --------------------------------`)
   let iteration = 1;
   let fight = setInterval(() => {
-    Round(iteration);
+    round(iteration);
     iteration++;
 
     if (isCharacterDead) {
@@ -111,6 +111,6 @@ ${warrior} hit ${mob} with ${characterDamage} dmg
   }, 1500)
 }
 
-Init();
+init();
 
-Fight();
+fight();
