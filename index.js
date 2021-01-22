@@ -1,21 +1,24 @@
-const characterName = 'Eritarhero';
-const characterClass = 'Warrior';
-const warrior = `${characterClass} ${characterName}`
-let characterLocation = 'Elven Forest';
-let characterHealth = 168;
-let characterDamage = getRandomDamage(12, 42);
+// Utils
 
-let isCharacterDead = false;
-let isAlliancePlayerNear  = false;
-
-const mobName = 'Ogre';
-const mobClass = 'Mage';
-const mob = `${mobName} ${mobClass}`
-let mobHealth = 124;
-let mobDamage = getRandomDamage(12, 42);
-let isMobDead = false;
-
-const deadText = 'dead  ☠ ☠';
+function createPlayerOrMob (
+  name = '',
+  type = '',
+  damage = null,
+  health = null,
+  location = '',
+  isPlayer = null,
+  isDead = false,
+) {
+  return {
+    name,
+    type,
+    damage,
+    health,
+    location,
+    isPlayer,
+    isDead,
+  }
+}
 
 function getRandomDamage(min, max) {
   min = Math.ceil(min);
@@ -23,93 +26,156 @@ function getRandomDamage(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
 
+function initDamage() {
+  return getRandomDamage(12, 24);
+}
+
+function reInitDamage(obj) {
+  return obj.damage = initDamage();
+}
+
+function consoleLog(info) {
+  return console.log(info);
+}
+
+function fullName(obj) {
+  return obj.name + ' ' + obj.type
+}
+
+function initInfoAboutPlayerOrMob(obj) {
+  const health = obj.health;
+  const damage = obj.damage;
+  const isPlayer = obj.isPlayer;
+
+  consoleLog(`| ${isPlayer ? 'You     :' : 'Enemy   :'} ${fullName(obj)}`);
+  consoleLog(`| Health  : ${health}`);
+  consoleLog(`| Damage  : ${damage}`);
+  consoleLog('-----------------------------------');
+}
+
 function init() {
-  console.log(`
------------------------------------
-| Location: ${characterLocation}
------------------------------------
-| You     : ${warrior}
-| Health  : ${characterHealth} hp
-| Damage  : ${characterDamage} dmg
------------------------------------
-| Enemy   : ${mob}
-| Health  : ${mobHealth} hp
-| Damage  : ${mobDamage} dmg
------------------------------------`)
+  consoleLog('-----------------------------------');
+  consoleLog(`| Location: ${player.location}`);
+  consoleLog('-----------------------------------');
+  initInfoAboutPlayerOrMob(player);
+  initInfoAboutPlayerOrMob(mob);
+}
+
+function setHealthAfterHit(attacking, defending) {
+  return defending.health -= attacking.damage
+}
+
+function hitInfo(attacking, defending) {
+  consoleLog(`${fullName(attacking)} hit ${fullName(defending)} with ${attacking.damage}`);
+}
+
+function healthInfo(obj) {
+  consoleLog(`In ${fullName(obj)} lefts ${obj.health}`);
+}
+
+function roundInfo(attacking, defending) {
+  hitInfo(attacking, defending);
+  healthInfo(defending);
+  consoleLog('| -----------------------------------');
+  hitInfo(defending, attacking);
+  healthInfo(attacking);
+  consoleLog('');
+}
+
+function setHealthZero(obj) {
+  if (obj.health < 0) {
+    return obj.health = 0
+  }
+
+  return obj.health
+}
+
+function isDead(obj) {
+  return obj.isDead = obj.health === 0;
 }
 
 function round(iteration) {
-  characterHealth -= mobDamage;
-  mobHealth -= characterDamage;
+  setHealthAfterHit(mob, player);
+  setHealthAfterHit(player, mob);
 
-  console.log(`
----- Round ${iteration} -------------------------------------------`)
+  consoleLog(`---- Round ${iteration} ----------------------`);
 
-  if (characterHealth > 0 && mobHealth > 0) {
-    console.log(
-`${mob} hit ${warrior} with ${mobDamage} dmg
-In ${warrior} lefts ${characterHealth} hp
-| -----------------------------------------------------------------
-${warrior} hit ${mob} with ${characterDamage} dmg
-In ${mob} lefts ${mobHealth} hp`
-    );
+  if (player.health > 0 && mob.health > 0) {
+    roundInfo(mob, player);
 
-    characterDamage = getRandomDamage(12, 42);
-    mobDamage = getRandomDamage(12, 42);
+    reInitDamage(player);
+    reInitDamage(mob);
   }
 
-  if (characterHealth < 0) {
-    characterHealth = 0;
-  }
+  setHealthZero(player);
+  setHealthZero(mob);
 
-  if (mobHealth < 0) {
-    mobHealth = 0;
-  }
+  isDead(player);
+  isDead(mob);
+}
 
-  isCharacterDead = characterHealth === 0
-  isMobDead = mobHealth === 0
+const skulls = '☠ ☠ ☠';
+
+function deadText(obj) {
+  consoleLog(`${skulls} ${fullName(obj)} is dead${skulls}`)
 }
 
 function fight() {
-  console.log(`
-|| --------------------------------
-|| Fight
-|| --------------------------------`)
+  consoleLog('-----------------------------------');
+  consoleLog(`|| Fight`);
+  consoleLog('-----------------------------------');
+
   let iteration = 1;
   let fight = setInterval(() => {
     round(iteration);
     iteration++;
 
-    if (isCharacterDead) {
-      console.log(`
-${mob} hit ${warrior} with ${mobDamage} dmg
-☠ ☠  ${warrior} is ${deadText}
-    `)
+    if (player.isDead) {
+      hitInfo(mob, player);
+      deadText(player);
     }
 
-    if (isMobDead) {
-      console.log(`
-${mob} hit ${warrior} with ${mobDamage} dmg
-In ${warrior} lefts ${characterHealth} hp
-| -----------------------------------------------------------------
-${warrior} hit ${mob} with ${characterDamage} dmg
-☠ ☠  ${mob} is ${deadText}
-    `)
+    if (mob.isDead) {
+      hitInfo(mob, player);
+      healthInfo(player);
+      consoleLog('| -----------------------------------');
+      hitInfo(player, mob);
+      deadText(mob);
     }
 
-    if (isCharacterDead && isMobDead) {
-      console.log(`
-${mob} hit ${warrior} with ${mobDamage} dmg
-${warrior} hit ${mob} with ${characterDamage} dmg
-☠ ☠  ${warrior} and ${mob} are ${deadText}
-    `)
+    if (player.isDead && mob.isDead) {
+      hitInfo(mob, player);
+      hitInfo(player, mob);
+      deadText(player);
+      deadText(mob);
     }
 
-    if (!(characterHealth > 0 && mobHealth > 0)) {
+    if (!(player.health > 0 && mob.health > 0)) {
       clearInterval(fight);
     }
   }, 1500)
 }
+
+// Body
+
+
+const player = createPlayerOrMob(
+  'Eritarhero',
+  'Warrior',
+  initDamage(),
+  168,
+  'Elven Forest',
+  true,
+);
+
+const mob = createPlayerOrMob(
+  'Ogre',
+  'Mage',
+  initDamage(),
+  124,
+  'Elven Forest',
+  false,
+);
 
 init();
 
