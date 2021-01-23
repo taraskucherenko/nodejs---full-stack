@@ -1,76 +1,80 @@
+/*
+* TODO: Add critical strike and chance of critical strike
+* */
+
 // Utils
 
-function createPlayerOrMob (
+const minDamagePoint = 12;
+const maxDamagePoint = 24;
+
+function createCreature (
   name = '',
-  type = '',
-  damage = null,
+  creatureClass = '',
   health = null,
   location = '',
   isPlayer = null,
-  isDead = false,
 ) {
   return {
     name,
-    type,
-    damage,
+    creatureClass,
     health,
     location,
     isPlayer,
-    isDead,
   }
 }
 
-function getRandomDamage(min, max) {
+function setCreatureDamage(min, max, obj) {
   min = Math.ceil(min);
   max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min) + min);
-}
-
-function initDamage() {
-  return getRandomDamage(12, 24);
-}
-
-function reInitDamage(obj) {
-  return obj.damage = initDamage();
+  return obj['damage'] = Math.floor(Math.random() * (max - min) + min);
 }
 
 function consoleLog(info) {
   return console.log(info);
 }
 
-function fullName(obj) {
-  return obj.name + ' ' + obj.type
+function displayNamePlusClass(obj) {
+  return obj.name + ' ' + obj.creatureClass
 }
 
-function initInfoAboutPlayerOrMob(obj) {
+function showInfoAboutCreature(obj) {
   const health = obj.health;
   const damage = obj.damage;
   const isPlayer = obj.isPlayer;
 
-  consoleLog(`| ${isPlayer ? 'You     :' : 'Enemy   :'} ${fullName(obj)}`);
+  consoleLog(`| ${isPlayer ? 'You     :' : 'Enemy   :'} ${displayNamePlusClass(obj)}`);
   consoleLog(`| Health  : ${health}`);
   consoleLog(`| Damage  : ${damage}`);
   consoleLog('-----------------------------------');
 }
 
 function init() {
+  setCreatureDamage(minDamagePoint, maxDamagePoint, player);
+  setCreatureDamage(minDamagePoint, maxDamagePoint, mob);
+
   consoleLog('-----------------------------------');
   consoleLog(`| Location: ${player.location}`);
   consoleLog('-----------------------------------');
-  initInfoAboutPlayerOrMob(player);
-  initInfoAboutPlayerOrMob(mob);
+  showInfoAboutCreature(player);
+  showInfoAboutCreature(mob);
+
+  fight();
 }
 
 function setHealthAfterHit(attacking, defending) {
-  return defending.health -= attacking.damage
+  defending.health -= attacking.damage
+
+  if (defending.health < 0) {
+    defending.health = 0
+  }
 }
 
 function hitInfo(attacking, defending) {
-  consoleLog(`${fullName(attacking)} hit ${fullName(defending)} with ${attacking.damage}`);
+  consoleLog(`${displayNamePlusClass(attacking)} hit ${displayNamePlusClass(defending)} with ${attacking.damage} dmg`);
 }
 
 function healthInfo(obj) {
-  consoleLog(`In ${fullName(obj)} lefts ${obj.health}`);
+  consoleLog(`In ${displayNamePlusClass(obj)} lefts ${obj.health} hp`);
 }
 
 function roundInfo(attacking, defending) {
@@ -82,16 +86,8 @@ function roundInfo(attacking, defending) {
   consoleLog('');
 }
 
-function setHealthZero(obj) {
-  if (obj.health < 0) {
-    return obj.health = 0
-  }
-
-  return obj.health
-}
-
 function isDead(obj) {
-  return obj.isDead = obj.health === 0;
+  obj['isDead'] = obj.health === 0;
 }
 
 function round(iteration) {
@@ -103,12 +99,9 @@ function round(iteration) {
   if (player.health > 0 && mob.health > 0) {
     roundInfo(mob, player);
 
-    reInitDamage(player);
-    reInitDamage(mob);
+    setCreatureDamage(minDamagePoint, maxDamagePoint, player);
+    setCreatureDamage(minDamagePoint, maxDamagePoint, mob);
   }
-
-  setHealthZero(player);
-  setHealthZero(mob);
 
   isDead(player);
   isDead(mob);
@@ -117,7 +110,7 @@ function round(iteration) {
 const skulls = '☠ ☠ ☠';
 
 function deadText(obj) {
-  consoleLog(`${skulls} ${fullName(obj)} is dead${skulls}`)
+  consoleLog(`| ---  ${skulls}  ${displayNamePlusClass(obj)} is dead  ${skulls}  --- |`)
 }
 
 function fight() {
@@ -158,25 +151,20 @@ function fight() {
 
 // Body
 
-
-const player = createPlayerOrMob(
+const player = createCreature(
   'Eritarhero',
   'Warrior',
-  initDamage(),
   168,
   'Elven Forest',
   true,
 );
 
-const mob = createPlayerOrMob(
+const mob = createCreature(
   'Ogre',
   'Mage',
-  initDamage(),
   124,
   'Elven Forest',
   false,
 );
 
 init();
-
-fight();
