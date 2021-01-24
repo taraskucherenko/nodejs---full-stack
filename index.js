@@ -87,7 +87,7 @@ function roundInfo(attacking, defending) {
 }
 
 function isDead(obj) {
-  obj['isDead'] = obj.health === 0;
+  return obj.health === 0;
 }
 
 function round(iteration) {
@@ -102,9 +102,6 @@ function round(iteration) {
     setCreatureDamage(minDamagePoint, maxDamagePoint, player);
     setCreatureDamage(minDamagePoint, maxDamagePoint, mob);
   }
-
-  isDead(player);
-  isDead(mob);
 }
 
 const skulls = '☠ ☠ ☠';
@@ -123,12 +120,12 @@ function fight() {
     round(iteration);
     iteration++;
 
-    if (player.isDead) {
+    if (isDead(player)) {
       hitInfo(mob, player);
       deadText(player);
     }
 
-    if (mob.isDead) {
+    if (isDead(mob)) {
       hitInfo(mob, player);
       healthInfo(player);
       consoleLog('| -----------------------------------');
@@ -136,14 +133,7 @@ function fight() {
       deadText(mob);
     }
 
-    if (player.isDead && mob.isDead) {
-      hitInfo(mob, player);
-      hitInfo(player, mob);
-      deadText(player);
-      deadText(mob);
-    }
-
-    if (!(player.health > 0 && mob.health > 0)) {
+    if (isDead(player) || isDead(mob)) {
       clearInterval(fight);
     }
   }, 1500)
