@@ -1,5 +1,6 @@
 /*
 * TODO: Add critical strike and chance of critical strike
+* TODO: Add DOTs for mob
 * */
 
 // Utils
@@ -104,10 +105,10 @@ function round(iteration) {
   }
 }
 
-const skulls = '☠ ☠ ☠';
+const SKULLS = '☠ ☠ ☠';
 
 function deadText(obj) {
-  consoleLog(`| ---  ${skulls}  ${displayNamePlusClass(obj)} is dead  ${skulls}  --- |`)
+  consoleLog(`| ---  ${SKULLS}  ${displayNamePlusClass(obj)} is dead  ${SKULLS}  --- |`)
 }
 
 function fight() {
@@ -142,7 +143,7 @@ function fight() {
 // Body
 
 const player = createCreature(
-  'Eritarhero',
+  'Eritrean',
   'Warrior',
   168,
   'Elven Forest',
