@@ -8,23 +8,19 @@
 const minDamagePoint = 12;
 const maxDamagePoint = 24;
 
-function CreateCreature (name, creatureClass, health, location, isPlayer) {
+function Creature (name, creatureClass, health, location, isPlayer) {
   this.name = name;
   this.creatureClass = creatureClass;
   this.health = health;
   this.location = location;
   this.isPlayer = isPlayer;
-  this.damage = setCreatureDamage(minDamagePoint, maxDamagePoint);
+  this.damage = setDamage();
 }
 
-function setCreatureDamage(min, max, obj) {
+function setDamage(min= minDamagePoint, max = maxDamagePoint) {
   min = Math.ceil(min);
   max = Math.floor(max);
-  const damage = Math.floor(Math.random() * (max - min) + min);
-
-  if (!obj) return damage
-
-  return obj.damage = damage
+  return Math.floor(Math.random() * (max - min) + min);
 }
 
 function consoleLog(info) {
@@ -47,9 +43,6 @@ function showInfoAboutCreature(obj) {
 }
 
 function init() {
-  setCreatureDamage(minDamagePoint, maxDamagePoint, player);
-  setCreatureDamage(minDamagePoint, maxDamagePoint, mob);
-
   consoleLog('-----------------------------------');
   consoleLog(`| Location: ${player.location}`);
   consoleLog('-----------------------------------');
@@ -97,8 +90,8 @@ function round(iteration) {
   if (player.health > 0 && mob.health > 0) {
     roundInfo(mob, player);
 
-    setCreatureDamage(minDamagePoint, maxDamagePoint, player);
-    setCreatureDamage(minDamagePoint, maxDamagePoint, mob);
+    player.damage = setDamage();
+    mob.damage = setDamage();
   }
 }
 
@@ -139,7 +132,7 @@ function fight() {
 
 // Body
 
-const player = new CreateCreature('Eritrean', 'Warrior', 168, 'Elven Forest', true);
-const mob = new CreateCreature('Ogre', 'Mage', 124, 'Elven Forest', false);
+const player = new Creature('Eritrean', 'Warrior', 168, 'Elven Forest', true);
+const mob = new Creature('Ogre', 'Mage', 124, 'Elven Forest', false);
 
 init();
