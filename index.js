@@ -8,20 +8,42 @@
 const minDamagePoint = 12;
 const maxDamagePoint = 24;
 
-function Creature (name, creatureClass, health, location, isPlayer) {
+function Creature (name, creatureClass, health, location) {
   this.name = name;
   this.creatureClass = creatureClass;
   this.health = health;
   this.location = location;
-  this.isPlayer = isPlayer;
   this.damage = setDamage();
 }
 
-function setDamage(min= minDamagePoint, max = maxDamagePoint) {
+function randomIntNumbers(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min) + min);
 }
+
+function setDamage(min= minDamagePoint, max = maxDamagePoint) {
+  return randomIntNumbers(min, max)
+}
+
+function randomCreature(max) {
+  return randomIntNumbers(0, max)
+}
+
+const alliance = [
+  new Creature('Eritar', 'Warrior', 168, 'Elven Forest'),
+  new Creature('Kapral', 'Hunter', 148, 'Elven Forest'),
+  new Creature('Kerber', 'Paladin', 158, 'Elven Forest'),
+];
+
+const enemies = [
+  new Creature('Ogre', 'Mage', 124, 'Elven Forest'),
+  new Creature('Ogre', 'Warrior', 164, 'Elven Forest'),
+  new Creature('Ogre', 'Shaman', 144, 'Elven Forest'),
+];
+
+const allianceLength = alliance.length;
+const enemiesLength = enemies.length;
 
 function consoleLog(info) {
   return console.log(info);
@@ -34,20 +56,32 @@ function displayNamePlusClass(obj) {
 function showInfoAboutCreature(obj) {
   const health = obj.health;
   const damage = obj.damage;
-  const isPlayer = obj.isPlayer;
 
-  consoleLog(`| ${isPlayer ? 'You     :' : 'Enemy   :'} ${displayNamePlusClass(obj)}`);
+  consoleLog(`| ${displayNamePlusClass(obj)}`);
   consoleLog(`| Health  : ${health}`);
   consoleLog(`| Damage  : ${damage}`);
   consoleLog('-----------------------------------');
 }
 
 function init() {
+  if (alliance.length) {
+    consoleLog('-----------------------------------');
+    consoleLog(`| Location: ${alliance[0].location}`);
+    consoleLog('-----------------------------------');
+  }
+
+  consoleLog(`| 'Alliance'`);
   consoleLog('-----------------------------------');
-  consoleLog(`| Location: ${player.location}`);
+  for (let i = 0; i < allianceLength; i++) {
+    showInfoAboutCreature(alliance[i]);
+  }
+
+  consoleLog(`| 'Enemies'`);
   consoleLog('-----------------------------------');
-  showInfoAboutCreature(player);
-  showInfoAboutCreature(mob);
+
+  for (let i = 0; i < enemiesLength; i++) {
+    showInfoAboutCreature(enemies[i]);
+  }
 
   fight();
 }
@@ -81,24 +115,55 @@ function isDead(obj) {
   return obj.health === 0;
 }
 
-function round(iteration) {
-  setHealthAfterHit(mob, player);
-  setHealthAfterHit(player, mob);
-
-  consoleLog(`---- Round ${iteration} ----------------------`);
-
-  if (player.health > 0 && mob.health > 0) {
-    roundInfo(mob, player);
-
-    player.damage = setDamage();
-    mob.damage = setDamage();
-  }
-}
-
 const SKULLS = '☠ ☠ ☠';
 
 function deadText(obj) {
   consoleLog(`| ---  ${SKULLS}  ${displayNamePlusClass(obj)} is dead  ${SKULLS}  --- |`)
+}
+
+function round(iteration) {
+  consoleLog(`---- Round ${iteration} ----------------------`);
+
+  let player = alliance[randomCreature(allianceLength)];
+  let mob = enemies[randomCreature(enemiesLength)];
+
+  if (isDead(player)) {
+    player = alliance[randomCreature(allianceLength)];
+  }
+
+  if (isDead(mob)) {
+    mob = enemies[randomCreature(enemiesLength)];
+  }
+
+  for (let i = 0; i < enemiesLength; i++) {
+    setHealthAfterHit(enemies[i], player);
+    roundInfo(enemies[i], player);
+
+    if (isDead(player)) {
+      break;
+    }
+
+    if (!isDead(player)) {
+      player.damage = setDamage();
+    }
+  }
+
+  for (let i = 0; i < allianceLength; i++) {
+    setHealthAfterHit(alliance[i], mob);
+    roundInfo(alliance[i], mob);
+
+    if (isDead(mob)) {
+      break;
+    }
+
+    if (!isDead(mob)) {
+      mob.damage = setDamage();
+    }
+  }
+
+  consoleLog('-----------------------------------');
+  consoleLog(`---- End Round ${iteration} ------------------`);
+  consoleLog('-----------------------------------');
 }
 
 function fight() {
@@ -111,28 +176,33 @@ function fight() {
     round(iteration);
     iteration++;
 
-    if (isDead(player)) {
-      hitInfo(mob, player);
-      deadText(player);
-    }
+    // for (let i = 0; i < enemiesLength; i++) {
+    //
+    // }
+    //
+    // for (let i = 0; i < allianceLength; i++) {
+    //
+    // }
 
-    if (isDead(mob)) {
-      hitInfo(mob, player);
-      healthInfo(player);
-      consoleLog('| -----------------------------------');
-      hitInfo(player, mob);
-      deadText(mob);
-    }
-
-    if (isDead(player) || isDead(mob)) {
-      clearInterval(fight);
-    }
-  }, 1500)
+    // if (isDead(player)) {
+    //   hitInfo(mob, player);
+    //   deadText(player);
+    // }
+    //
+    // if (isDead(mob)) {
+    //   hitInfo(mob, player);
+    //   healthInfo(player);
+    //   consoleLog('| -----------------------------------');
+    //   hitInfo(player, mob);
+    //   deadText(mob);
+    // }
+    //
+    // if (isDead(player) || isDead(mob)) {
+    //   clearInterval(fight);
+    // }
+  }, 2500)
 }
 
 // Body
-
-const player = new Creature('Eritrean', 'Warrior', 168, 'Elven Forest', true);
-const mob = new Creature('Ogre', 'Mage', 124, 'Elven Forest', false);
 
 init();
